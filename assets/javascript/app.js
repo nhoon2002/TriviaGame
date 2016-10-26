@@ -68,13 +68,14 @@ var objects = [
 var correct_count = 0;
 var incorrect_count = 0;
 var null_count = 0;
+var Qindex = 0;
 
 
 
-var number = 30;
+var number = 5;
 
 // When  button gets clicked, run the stop function.
-$('answers').on('click', stop);
+// $('answers').on('click', stop);
 // When the resume button gets clicked, execute the run function.
 
 
@@ -83,35 +84,26 @@ $('answers').on('click', stop);
 function run(){
     counter = setInterval(decrement, 1000);
 }
-
 // The decrement function.
 function decrement(){
     // Decrease number by one.
     number--;
     // Show the number in the #show-number tag.
     $('#timer').html('<h2> Time Remaining: ' + number + 's </h2>');
-
     // Once number hits zero...
     if (number === 0){
       // ...run the stop function.
       stop();
-      //
-
+      null_count++;
     }
 }
-
 // The stop function
-function stop(){
-    // Clears our "counter" interval.
-    // We just pass the name of the interval
-    // to the clearInterval function.
+function stop(response, index){
     clearInterval(counter);
-    number = 30;
-    answerScreen(null);
+    number = 5;
+    answerScreen(response, index)
+
 }
-
-
-// Execute the run function.
 
 
 
@@ -129,30 +121,50 @@ function answerScreen(response, index) {
    $('.answers').html('');
    if (response == "correct") {
       $('.questionBox').html('<h1>Correct!</h1>')
-      $('#answer_container').html('<img src=' + objects[index].image +'>');
+      $('.answers').html('');
+      $('#image_container').html('<img src=' + objects[index].image +'>');
 
    } else if (response == "incorrect") {
       //SHOW INCORRECT SCREEN
       $('.questionBox').html('<h1>Incorrect...!</h1><br /><h2>The correct answer was: ' + objects[index].display_correct);
-      $('#answer_container').html('<img src=' + objects[index].image +'>');
+      $('.answers').html('');
+      $('#image_container').html('<img src=' + objects[index].image +'>');
 
-   } else if (response == "null") {
+   } else {
       $('#timer').html('Out of time!');
       //SHOW OUT OF TIME SCREEN
-      $('.questionBox').html('<h1>Incorrect...!</h1><br /><h2>The correct answer was: ' + objects[index].display_correct);
-      $('#answer_container').html('<img src=' + objects[index].image +'>');
+      $('.questionBox').html('<h1>You did not provide an answer...!</h1>');
+      $('.answers').html('');
+      $('#image_container').html('<img src = "assets/images/pokerface.jpg" height="50%" width="50%">');
+      Qindex++
+      setTimeout(function() { nextQuestion(Qindex); }, 3000);
    }
+
+
+
+}
+
+function resultScreen() {
+   $('.questionBox').html('<h1>You have completed the survey! Here are your results: </h1><br /><h2># Correct: ' + correct_count + '<br># Incorrect: ' + incorrect_count + '<br># Unanswered: ' + null_count);
+   $('.answers').html('');
+   $('#image_container').html('<img src = "assets/images/result.jpg">');
 }
 
 function nextQuestion(num) {
+   console.log(correct_count, incorrect_count, null_count);
+
    userGuess = null;
-   stopwatch.reset;
+   number = 5;
+   run()
    // TODO: new questions
-   $('.questionBox').html(objects[num].question + ' ' + objects[num].answer_choices + ' ' + objects[num].answer_correct);
-   $('#first').append(objects[num].answer_choices[0]);
-   $('#second').append(objects[num].answer_choices[1]);
-   $('#third').append(objects[num].answer_choices[2]);
-   $('#fourth').append(objects[num].answer_choices[3]);
+
+
+   $('.questionBox').html(objects[num].question);
+   $('#image_container').html('');
+   $('#first').html(objects[num].answer_choices[0]);
+   $('#second').html(objects[num].answer_choices[1]);
+   $('#third').html(objects[num].answer_choices[2]);
+   $('#fourth').html(objects[num].answer_choices[3]);
 
 
 }
@@ -174,32 +186,30 @@ $('button').on('click', function(){
 
    //start the game;
    // TODO: Start the timer
-
+   Qindex = 0;
    gameStart();
-
-   //Start Timer
    run();
-
    //Shuffle Questions
    shuffleArray(objects);
-
    console.log(objects);
 
-   var Qindex = 0;
+   //Show Questions and choices
    $('.questionBox').html(objects[Qindex].question);
-   $('#first').append(objects[Qindex].answer_choices[0]);
-   $('#second').append(objects[Qindex].answer_choices[1]);
-   $('#third').append(objects[Qindex].answer_choices[2]);
-   $('#fourth').append(objects[Qindex].answer_choices[3]);
+   $('#first').html(objects[Qindex].answer_choices[0]);
+   $('#second').html(objects[Qindex].answer_choices[1]);
+   $('#third').html(objects[Qindex].answer_choices[2]);
+   $('#fourth').html(objects[Qindex].answer_choices[3]);
 
-   // 3 cases: 1) user clicks on wrong answer, 2) user clicks on a correct answer, 3) user does not give an answer
+
    var userGuess = null;
+
+
 
       $('.answers').on("click", function(){
          userGuess = ($(this).attr('id'));
          console.log(userGuess);
          // TODO: Stop timer on click
-         stop();
+
 
 
 
@@ -207,26 +217,36 @@ $('button').on('click', function(){
 
             var checker = "correct";
             //Correct! Show correct screen and embed image/video graphics
-            answerScreen(checker, Qindex);
+            stop(checker,Qindex);
+            // answerScreen(checker, Qindex);
             correct_count++;
-            Qindex++;
+
          } else if (userGuess !== objects[Qindex].answer_correct) {
 
             var checker = "incorrect";
             //Wrong answer! Incorrect screen and show the correct answer
-            answerScreen(checker, Qindex);
+            stop(checker,Qindex);
+            // answerScreen(checker, Qindex);
             incorrect_count++;
-            Qindex++;
+
          }
-         // } else if (userGuess == null) {
+
+      Qindex++;
+
+      if (Qindex < 8) {
+         setTimeout(function() { nextQuestion(Qindex); }, 3000);
+      } else {
+         resultScreen();
+      }
+         // } else if (userGuess == null)  {
          //
          //    var checker = "null";
          //    //Out of time! No answer selected! Show correct answer
-         //    answerScreen(checker, Qindex);
+         //    stop(checker, Qindex);
          //    null_count++;
          //    Qindex++;
          // }
-
+      console.log(Qindex);
       });
 
 
