@@ -105,13 +105,15 @@ function stop(response, index){
 
 }
 
+function endInterval() {
+   clearInterval(counter);
+}
+
 
 
 console.log(objects[0]);
 
-function gameStart() {
 
-}
 
 function answerScreen(response, index) {
    // TODO: set delays to show this screen for 5 seconds
@@ -136,18 +138,32 @@ function answerScreen(response, index) {
       $('.questionBox').html('<h1>You did not provide an answer...!</h1>');
       $('.answers').html('');
       $('#image_container').html('<img src = "assets/images/pokerface.jpg" height="50%" width="50%">');
-      Qindex++
-      setTimeout(function() { nextQuestion(Qindex); }, 3000);
+      Qindex++;
+      console.log(Qindex);
+         if (Qindex < 8) {
+            setTimeout(function() { nextQuestion(Qindex); }, 3000);
+            } else {
+            setTimeout(resultScreen(), 3000);
+            return;
+            }
+         }
+
+
+
    }
 
 
 
-}
+
 
 function resultScreen() {
+   endInterval();
    $('.questionBox').html('<h1>You have completed the survey! Here are your results: </h1><br /><h2># Correct: ' + correct_count + '<br># Incorrect: ' + incorrect_count + '<br># Unanswered: ' + null_count);
    $('.answers').html('');
    $('#image_container').html('<img src = "assets/images/result.jpg">');
+
+
+
 }
 
 function nextQuestion(num) {
@@ -157,15 +173,19 @@ function nextQuestion(num) {
    number = 5;
    run()
    // TODO: new questions
+   if (Qindex < 8) {
 
 
-   $('.questionBox').html(objects[num].question);
-   $('#image_container').html('');
-   $('#first').html(objects[num].answer_choices[0]);
-   $('#second').html(objects[num].answer_choices[1]);
-   $('#third').html(objects[num].answer_choices[2]);
-   $('#fourth').html(objects[num].answer_choices[3]);
-
+      $('#timer').html('<h2> Time Remaining: ' + number + 's </h2>');
+      $('.questionBox').html(objects[num].question);
+      $('#image_container').html('');
+      $('#first').html(objects[num].answer_choices[0]);
+      $('#second').html(objects[num].answer_choices[1]);
+      $('#third').html(objects[num].answer_choices[2]);
+      $('#fourth').html(objects[num].answer_choices[3]);
+   } else {
+      resultScreen();
+   }
 
 }
 
@@ -181,13 +201,16 @@ function shuffleArray(array) {
     return array;
 }
 
+window.onload = function() {
+   $(".answers").css("display: none");
+}
 
-$('button').on('click', function(){
+$('#start').on('click', function(){
 
    //start the game;
    // TODO: Start the timer
    Qindex = 0;
-   gameStart();
+
    run();
    //Shuffle Questions
    shuffleArray(objects);
