@@ -72,7 +72,7 @@ var Qindex = 0;
 
 
 
-var number = 5;
+var number = 30;
 
 // When  button gets clicked, run the stop function.
 // $('answers').on('click', stop);
@@ -100,7 +100,7 @@ function decrement(){
 // The stop function
 function stop(response, index){
     clearInterval(counter);
-    number = 5;
+    number = 30;
     answerScreen(response, index)
 
 }
@@ -170,7 +170,7 @@ function nextQuestion(num) {
    console.log(correct_count, incorrect_count, null_count);
 
    userGuess = null;
-   number = 5;
+   number = 30;
    run()
    // TODO: new questions
    if (Qindex < 8) {
